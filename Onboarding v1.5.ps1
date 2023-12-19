@@ -976,6 +976,7 @@ function RestoreSecurity
     #$MailboxGroupMFAexemptions = (get-azureadgroup -SearchString "MFA_Exemptions").objectid
     #Add-AzureADGroupMember -objectid "$MailboxGroupMFAexemptions" -RefObjectId "$NewUserObjectID";
     #$AddedToMFAExemptions = "Added to temporary 'MFA_Exemptions' cloud group.";
+    $EmailPass = Read-Host "Enter LandryLabs.Bot password"
     $username = Read-Host "Username"
     $emailAddress = (get-aduser -identity $username).userprincipalname
     $newUserObjectID = (get-azureaduser -filter "userprincipalname eq '$EmailAddress'").objectid
@@ -991,7 +992,6 @@ function RestoreSecurity
     $TempPass = "$username's password is now temporary and will need to be changed at next login."
     $TempPass
 
-    #$EmailPass = Read-Host "Enter LandryLabs.Bot password"
     $PasswordEmail = ConvertTo-SecureString $EmailPass -AsPlainText -Force
     $from = "landrylabs.bot@sparkhound.com";
     $To = "mi-t2@sparkhound.com";
