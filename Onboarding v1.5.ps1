@@ -41,6 +41,32 @@ $TimeStart = Get-Date
 #START OF FUNCTIONS
 #==========V==========#
 
+function ObtainTicketNumber
+{
+    $ticketNumber = Read-Host "Enter Connectwise Ticket Number (Don't include the '#')";
+        #if ($ticketNumber.Length -ne "6") {Write-Host "Ticket Number must be 6 characters long."; $ticketNumber = $Null; ObtainTicketNumber};
+    Write-Host "Submitted Ticket Number: $ticketNumber";
+    $ticketNumber = "#$ticketNumber";
+    Return $ticketNumber;
+}
+
+function ObtainTicketNumberWithVerification
+{
+    $arrayOfNumbers = @("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+
+    $ticketNumber = Read-Host "Enter Connectwise Ticket Number";
+        if ($ticketNumber.Length -ne "6") {Write-Host "Ticket Number must be 6 characters long."};
+        foreach ($num in $arrayOfNumbers) 
+        {
+            $i = 0;
+            if ($num -eq $ticketNumber[$i]) {Write-Host ""}}
+
+
+
+    Write-Host "Submitted Ticket Number: $ticketNumber";
+    Return $ticketNumber;
+}
+
 function ObtainFirstName
 {
             
@@ -635,6 +661,12 @@ function ObtainDepartment ($Practice)
     if ($Department -eq "Business Process Management")
         {
             Write-Host "Skipping verification. Returning allowed override of Department 'Business Process Management'"
+            return $Department;
+        }
+    if ($Department -eq "Partner") # 01/08/24: Added to support CWM ticket #918395.
+        {
+            $Department = "Executive";
+            Write-Host "Skipping verification. Returning allowed override of department 'Partner' to 'Executive'."
             return $Department;
         }
     Start-sleep 1
@@ -1635,6 +1667,7 @@ Menu; #Script starts interaction with this 'Program' function.
 #==========v==========#
     $EmailPass = Read-Host "Enter LandryLabs.Bot password"
     Write-Host "Step 1 - Supply onboarding user information for verification";
+    $ticketNumber = ObtainTicketNumber;
     $FirstName = ObtainFirstName;
     $LastName = ObtainLastName;
     $Name = ObtainFullName;
@@ -1663,12 +1696,13 @@ Menu; #Script starts interaction with this 'Program' function.
     #$SubmissionArray = @($FirstName, $LastName, $Name, $Username, $EmailAddress, $Title, $Region, $PhoneNumber, $PersonalEmail, $Company, $Manager, $MirrorUser, $practice, $Department, $UserOUPath, $UKG, $OpenAirSSO, $NetSuiteSSO)
     #InformationReview -SubmissionArray $SubmissionArray; #Testing
     #InformationApproval #Testing
+    $InfoField = "$PersonalEmail`nProvisioned per CWM ticket $ticketNumber"
 
 #==========^==========#
 #Step 2: Create user object
 #==========V==========#
     "Step 2 - Starting account creation..."
-    New-ADUser -Name "$Name" -samaccountname $username -UserPrincipalName $EmailAddress -AccountPassword $Password -Enabled $true -ChangePasswordAtLogon $false -GivenName $FirstName -Surname $LastName -DisplayName $Name -City $Region -Office $Region -Company $Company -Department $Department -Description $Title -EmailAddress $EmailAddress -Manager $Manager -MobilePhone $PhoneNumber -Title $Title -OfficePhone $PhoneNumber -OtherAttributes @{'info'=$PersonalEmail}
+    New-ADUser -Name "$Name" -samaccountname $username -UserPrincipalName $EmailAddress -AccountPassword $Password -Enabled $true -ChangePasswordAtLogon $false -GivenName $FirstName -Surname $LastName -DisplayName $Name -City $Region -Office $Region -Company $Company -Department $Department -Description $Title -EmailAddress $EmailAddress -Manager $Manager -MobilePhone $PhoneNumber -Title $Title -OfficePhone $PhoneNumber -OtherAttributes @{'info'=$InfoField}
     #-OtherAttributes @{'notes'=$PersonalEmail}
     $CheckAccountCreation = (get-aduser -Identity $username -properties *).userprincipalname
         if ($CheckAccountCreation -eq $EmailAddress) 
@@ -1860,7 +1894,7 @@ $To = "mi-t2@sparkhound.com";
 #$Cc = "joshua.chilton@sparkhound.com";
 #$Cc = "mi-t2@sparkhound.com";
 $Port = 587
-$Subject = "Onboarding - Account Provisioning Complete | $EmailAddress."
+$Subject = "Onboarding - Account Provisioning Complete | $EmailAddress | CWM$ticketNumber."
 $SMTPserver = "smtp.office365.com"
 $Cred = New-Object -typename System.Management.Automation.PSCredential -argumentlist $from, $PasswordEmail
 $Signature = "`n`nThank you,`nLandryLabs `nAutomation Assistant `nQuestions? Email 'mi-t2@sparkhound.com'."
