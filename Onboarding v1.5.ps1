@@ -566,6 +566,12 @@ function ObtainPractice
             Write-Host "Skipping verification. Returning allowed override of Practice 'Digital Transformation'"
             return $Practice;
         }
+    if ($Practice -eq "CALLCT-Contact Center Operations")
+        {
+            $Practice = "Contact Center Operations"
+            Write-Host "Skipping verification. Returning allowed override of Practice 'Digital Transformation'"
+            return $Practice;
+        }
     if ($Null -ne $practiceOUCHeck1)
         {
             
@@ -658,6 +664,11 @@ function ObtainDepartment ($Practice)
             #$DepartmentWildCard = "$Department"
             return $Department
         }
+    if ($Department -eq "Support Service-Tier 1")
+        {
+            $Department = "Tier I"
+            return $Department
+        }
     if ($Department -eq "Business Process Management")
         {
             Write-Host "Skipping verification. Returning allowed override of Department 'Business Process Management'"
@@ -667,6 +678,12 @@ function ObtainDepartment ($Practice)
         {
             $Department = "Executive";
             Write-Host "Skipping verification. Returning allowed override of department 'Partner' to 'Executive'."
+            return $Department;
+        }
+    if ($Department -eq "CALLCR-Contact Center Operations")
+        {
+            $Department = "Contact Center Operations";
+            Write-Host "Skipping verification. Returning allowed override of department 'Contact Center Operations'."
             return $Department;
         }
     Start-sleep 1
@@ -778,13 +795,18 @@ function ObtainBusinessUnit ($Practice)
 }
 function ObtainUserOUPath ($Department, $Practice)
 {
-    # (10/24/23) OU Path Overriding for HR template: "OU=Business Process Management,OU=Digital Transformation" 
+    # (10/24/23) OU Path Overriding for HR template: "OU=Business Process Management,OU=Digital Transformation"
+    $UserOUPath = "OU=$Department,OU=$Practice,OU=Domain Users,DC=sparkhound,DC=com"
     if ($Practice -eq "Digital Transformation" -and $Department -eq "Business Process Management")
         {
             $UserOUPath = "OU=Business Process Management,OU=Domain Users,DC=sparkhound,DC=com";
             return $UserOUPath;
         }
-    $UserOUPath = "OU=$Department,OU=$Practice,OU=Domain Users,DC=sparkhound,DC=com"
+    if ($Practice -eq "Contact Center Operations" -and $Department -eq "Contact Center Operations")
+        {
+            $UserOUPath = "OU=Contact Center Operations,OU=Domain Users,DC=sparkhound,DC=com";
+            return $UserOUPath;
+        }
     Write-Host "Declared OU Path: $userOUPath"
     return $UserOUPath;
 }
@@ -1894,7 +1916,9 @@ $To = "mi-t2@sparkhound.com";
 #$Cc = "joshua.chilton@sparkhound.com";
 #$Cc = "mi-t2@sparkhound.com";
 $Port = 587
-$Subject = "Onboarding - Account Provisioning Complete | $EmailAddress | CWM$ticketNumber."
+
+#$Subject = "Onboarding - Account Provisioning Complete | $EmailAddress | CWM$ticketNumber."
+$Subject = "New Sparkie Account Activated - $Firstname $LastName - $Department $Title - CWM#$ticketNumber"
 $SMTPserver = "smtp.office365.com"
 $Cred = New-Object -typename System.Management.Automation.PSCredential -argumentlist $from, $PasswordEmail
 $Signature = "`n`nThank you,`nLandryLabs `nAutomation Assistant `nQuestions? Email 'mi-t2@sparkhound.com'."
