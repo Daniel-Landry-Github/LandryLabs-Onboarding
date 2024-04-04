@@ -1,5 +1,5 @@
 ﻿<#
-
+#### GIT BRANCH1 CHANGE
 #      || LANDRY LABS - ONBOARDING SCRIPT (Updated 04/08/2023)
 #      || SUMMARY: 1. Creates on-prem user object and populates with verified user information.;
 # #    || -------- 2. Provisions mailbox and cloud group SSO access;
@@ -8,7 +8,7 @@
   #### || Written by Daniel Landry (daniel.landry@sparkhound.com)
 
 #>
- 
+
 <#----------TO DO:
 -BUILD:
 -FIX:
@@ -569,8 +569,15 @@ function ObtainPractice
     if ($Practice -eq "CALLCT-Contact Center Operations")
         {
             $Practice = "Contact Center Operations"
-            Write-Host "Skipping verification. Returning allowed override of Practice 'Digital Transformation'"
+            Write-Host "Skipping verification. Returning allowed override of Practice 'Contact Center Operations'"
             return $Practice;
+        }
+    if ($Practice -eq "IT Modernization Services")
+        {
+            $Practice = "IT Modernization Services"
+            Write-Host "Skipping verification. Returning allowed override of Practice 'IT Modernization Services'";
+            return $Practice;
+
         }
     if ($Null -ne $practiceOUCHeck1)
         {
@@ -684,6 +691,12 @@ function ObtainDepartment ($Practice)
         {
             $Department = "Contact Center Operations";
             Write-Host "Skipping verification. Returning allowed override of department 'Contact Center Operations'."
+            return $Department;
+        }
+    if ($Department -eq "Consulting")
+        {
+            $Department = "Consulting";
+            Write-Host "Skipping verification. Returning allowed override of department 'Consulting'.";
             return $Department;
         }
     Start-sleep 1
@@ -800,11 +813,19 @@ function ObtainUserOUPath ($Department, $Practice)
     if ($Practice -eq "Digital Transformation" -and $Department -eq "Business Process Management")
         {
             $UserOUPath = "OU=Business Process Management,OU=Domain Users,DC=sparkhound,DC=com";
+            Write-Host "Declared OU Path: $userOUPath";
             return $UserOUPath;
         }
     if ($Practice -eq "Contact Center Operations" -and $Department -eq "Contact Center Operations")
         {
             $UserOUPath = "OU=Contact Center Operations,OU=Domain Users,DC=sparkhound,DC=com";
+            Write-Host "Declared OU Path: $userOUPath";
+            return $UserOUPath;
+        }
+    if ($Practice -eq "IT Modernization Services" -and $Department -eq "Consulting")
+        {
+            $UserOUPath = "OU=IT Modernization Services,OU=Domain Users,DC=sparkhound,DC=com";
+            Write-Host "Declared OU Path: $userOUPath";
             return $UserOUPath;
         }
     Write-Host "Declared OU Path: $userOUPath"
