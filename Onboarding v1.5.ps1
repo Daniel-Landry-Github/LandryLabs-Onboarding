@@ -46,7 +46,7 @@ function ObtainTicketNumber
     $ticketNumber = Read-Host "Enter Connectwise Ticket Number (Don't include the '#')";
         #if ($ticketNumber.Length -ne "6") {Write-Host "Ticket Number must be 6 characters long."; $ticketNumber = $Null; ObtainTicketNumber};
     Write-Host "Submitted Ticket Number: $ticketNumber";
-    $ticketNumber = "#$ticketNumber";
+    $ticketNumber = "$ticketNumber";
     Return $ticketNumber;
 }
 
@@ -1981,7 +1981,7 @@ Send-MailMessage -from $From -To $To -Subject $Subject -Body "$CWMnote`n$LogTran
 # TODO 5/4/23: Add manager of hire to this email.
     # Take verified manager username string, append '@sparkhound' into mailing variable; add to $HRCc array.
     # UPDATE 5/4/23: Change was made and was successful.
-$ManagerEmail = (get-aduser -identity $manager).userprincipalname
+$ManagerEmail = (get-aduser -identity $manager -properties EmailAddress).EmailAddress;
 $ToHR = "HR@sparkhound.com";
 $HRCc = @("mi-t2@sparkhound.com", $ManagerEmail);
 $BodyHR = "Hello Hr,`n`n$EmailAddress has been created for $Name. Forwarding their initial password of 'Welcome@123'."
